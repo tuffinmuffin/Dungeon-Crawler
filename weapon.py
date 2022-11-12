@@ -3,7 +3,7 @@ import pygame
 import math
 import character
 import random
-
+from typing import List
 class Weapon():
     def __init__(self, image: pygame.Surface, projectile: pygame.Surface):
         self._image = image
@@ -57,7 +57,12 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = -math.sin(math.radians(angle)) * constants.ARROW_SPEED
 
 
-    def update(self, enemy_list: list[character.Character]):
+    def update(self, enemy_list: list[character.Character], screen_scroll : List[int]):
+
+        #reposition based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
         damage = 0
         damage_pos = None
 
@@ -75,7 +80,7 @@ class Arrow(pygame.sprite.Sprite):
             if enemy.is_alive() and enemy.rect.colliderect(self.rect):
                 damage = 10 + random.randint(-5, 5)
                 damage_pos = enemy.rect
-                enemy.health -= damage
+                enemy.change_health(-damage)
                 self.kill()
                 break
 
