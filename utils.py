@@ -10,6 +10,7 @@ from items import ItemType
 
 import constants
 
+
 #help to scale image
 def  scale_img(image : pygame.Surface, scale: float):
     w = image.get_width() * scale
@@ -114,3 +115,35 @@ def load_level(level : int, path : str = f"levels"):
         exit(1)
 
     return level_data
+
+
+#class for screen fading
+
+class ScreenFade():
+    def __init__(self, screen, direction, color, speed) -> None:
+        self.screen = screen
+        self.direction = direction
+        self.color = color
+        self.speed = speed
+        self.fade_counter = 0
+
+    def fade(self):
+        fade_complete = False
+        self.fade_counter += self.speed
+        if self.direction == 1: #whole screen fade
+            pygame.draw.rect(self.screen, self.color, (0 - self.fade_counter , 0, constants.SCREEN_WIDTH//2, constants.SCREEN_HEIGHT))
+            pygame.draw.rect(self.screen, self.color, (constants.SCREEN_WIDTH // 2 + self.fade_counter , 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+            pygame.draw.rect(self.screen, self.color, (0, 0 - self.fade_counter, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT // 2))
+            pygame.draw.rect(self.screen, self.color, (0, constants.SCREEN_HEIGHT // 2 + self.fade_counter, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+
+        elif self.direction == 2: #verticale screen fade
+            pygame.draw.rect(self.screen, self.color, (0, 0, constants.SCREEN_WIDTH, self.fade_counter))
+
+        if self.fade_counter >= constants.SCREEN_WIDTH:
+            fade_complete = True
+
+        return fade_complete
+
+
+    def reset(self):
+        self.fade_counter = 0

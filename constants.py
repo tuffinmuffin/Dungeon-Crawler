@@ -1,3 +1,8 @@
+import pygame
+from typing import TypeAlias
+#types
+TileData : TypeAlias = tuple[ pygame.Surface, pygame.Rect, int, int]
+TileList : TypeAlias = list[TileData]
 
 #game params
 FPS = 60
@@ -5,17 +10,25 @@ FPS = 60
 #Player params
 PLAYER_SPEED = 5
 ARROW_SPEED = 10
+FIREBALL_SPEED = 4
 HEALTH_PER_HEART = 20
+
+#Enemy Params
+ENEMY_SPEED = 4
+ENEMY_RANGE = 50
+ATTACK_RANGE = 60
 
 #Screen
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 SCALE = 3
+BUTTON_SCALE = 1.0
 WEAPON_SCALE = 1.5
+WEAPON_SMALL_SCALE = 1.0
 HEART_SCALE = 3
-POT_SCALE = 2
-COIN_SCALE = 2
+POT_SCALE = 4
+COIN_SCALE = 4
 OFFSET = 12
 SCROLL_THRESH = 200
 
@@ -43,6 +56,7 @@ HEART_PATH = "assets/images/items/heart/"
 COIN_PATH = "assets/images/items/coin/"
 POT_PATH = "assets/images/items/pot/"
 TILE_PATH = "assets/images/tiles/"
+BUTTON_PATH = "assets/images/buttons/"
 
 FULL_HEART_KEY = "heart_full"
 HALF_HEART_KEY = "heart_half"
@@ -56,5 +70,8 @@ COIN_KEY = ["coin_f0", "coin_f1", "coin_f2", "coin_f3"]
 #colors
 RED = (255,0,0)
 WHITE = (255,255,255)
+BLACK = (0, 0, 0)
+PINK = (235, 65, 54)
 BG = (40, 25, 25)
+MENU_BG = (130, 0, 0)
 PANEL = (50, 50, 50)

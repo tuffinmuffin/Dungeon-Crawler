@@ -25,7 +25,7 @@ class Item(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.pos_fixed = pos_fixed
 
-    def update(self, screen_scroll: List[int], player: character.Character):
+    def update(self, screen_scroll: List[int], player: character.Character, coin_fx: pygame.mixer.Sound = None, heal_fx: pygame.mixer.Sound = None):
 
         #reposition based on screen scroll
         if not self.pos_fixed:
@@ -39,8 +39,12 @@ class Item(pygame.sprite.Sprite):
             if self.rect.colliderect(player.rect):
                 if self.item_type == ItemType.COIN:
                     player.change_score(1)
+                    if coin_fx:
+                        coin_fx.play()
                 elif self.item_type == ItemType.HP_POT:
                     player.change_health(10)
+                    if heal_fx:
+                        heal_fx.play()
 
                 #drop item
                 self.kill()

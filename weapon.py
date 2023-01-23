@@ -1,9 +1,15 @@
 import constants
 import pygame
 import math
-import character
+
 import random
 from typing import List
+from constants import TileList
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from world import World
 class Weapon():
     def __init__(self, image: pygame.Surface, projectile: pygame.Surface):
         self._image = image
@@ -57,7 +63,7 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = -math.sin(math.radians(angle)) * constants.ARROW_SPEED
 
 
-    def update(self, enemy_list: list[character.Character], screen_scroll : List[int]):
+    def update(self, enemy_list: list["Character"], screen_scroll : tuple[int, int], obstacles : TileList):
 
         #reposition based on screen scroll
         self.rect.x += screen_scroll[0]
@@ -79,13 +85,59 @@ class Arrow(pygame.sprite.Sprite):
         for enemy in enemy_list:
             if enemy.is_alive() and enemy.rect.colliderect(self.rect):
                 damage = 10 + random.randint(-5, 5)
+                stun_cooldown = 100
                 damage_pos = enemy.rect
-                enemy.change_health(-damage)
+                enemy.hit(damage, stun_cooldown, True)
                 self.kill()
                 break
+
+        for obstacle in obstacles:
+            if obstacle[1].collidepoint(self.rect.center):
+                self.kill()
 
         return damage, damage_pos
 
 
+class Fireball(pygame.sprite.Sprite):
+    def __init__(self, image : pygame.Surface, x: float, y: float, target_x: float, target_y: float):
+        super().__init__()
+        self.image_org = image["fireball"]
+        self._angle = math.degrees(math.atan2(-(target_y - y), target_x - x))
+        self.image = pygame.transform.rotate(self.image_org, self._angle - 90.0)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+
+        #calculate x and y vel
+        self.dx = math.cos(math.radians(self._angle)) * constants.FIREBALL_SPEED
+        self.dy = -math.sin(math.radians(self._angle)) * constants.FIREBALL_SPEED
 
 
+    def update(self, enemy_list: list["Character"], screen_scroll : tuple[int, int], world : "World"):
+        damage = None
+        damage_pos = None
+        #reposition based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        #update sprite image
+        self.rect.y += self.dy
+        self.rect.x += self.dx
+
+        #check if arrow has gone off screen
+        if (self.rect.right < 0 or self.rect.left > constants.SCREEN_WIDTH or
+             self.rect.bottom < 0 or self.rect.top > constants.SCREEN_HEIGHT):
+             self.kill()
+
+        #check collision between arrow and enemies
+        for enemy in enemy_list:
+            if enemy.is_alive() and enemy.rect.colliderect(self.rect):
+                damage = 10 + random.randint(-5, 5)
+                damage_pos = enemy.rect
+                enemy.hit(damage, 0, True)
+                self.kill()
+                break
+
+        for obstacle in world.get_obstacles():
+            if obstacle[1].collidepoint(self.rect.center):
+                self.kill()
+
+        return damage, damage_pos
